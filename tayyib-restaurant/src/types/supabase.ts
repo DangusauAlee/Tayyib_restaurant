@@ -9,7 +9,7 @@ export interface Database {
           email: string;
           full_name: string;
           role: 'MD' | 'Manager' | 'NMD';
-          restaurant_id: string;
+          restaurant_id: string | null;
           avatar_url: string | null;
           phone: string | null;
           is_active: boolean;
@@ -23,7 +23,7 @@ export interface Database {
           email: string;
           full_name: string;
           role: 'MD' | 'Manager' | 'NMD';
-          restaurant_id?: string;
+          restaurant_id?: string | null;
           avatar_url?: string | null;
           phone?: string | null;
           is_active?: boolean;
@@ -110,26 +110,30 @@ export interface Database {
     };
     Views: {};
     Functions: {
-      get_daily_data: {
-        Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string; p_group_by?: string };
-        Returns: { period: string; revenue: number; expenses: number; profit: number; tickets: number }[];
+      get_user_profile: {
+        Args: { user_id: string };
+        Returns: Database['public']['Tables']['users']['Row'][];
       };
+      get_daily_data: {
+  Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string; p_group_by?: string };
+  Returns: { period: string; revenue: number; expenses: number; profit: number; tickets: number }[];
+};
       calculate_dashboard_metrics: {
         Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string };
         Returns: {
-          totalrevenue: number;
-          totalexpenses: number;
-          netprofit: number;
-          profitmargin: number;
-          totaltransactions: number;
-          averagedailyrevenue: number;
-          averagedailyexpenses: number;
-          totalmealtickets: number;
-          averagemealticketprice: number;
-          currentcashbalance: number;
-          revenuechange: number;
-          expensechange: number;
-          profitchange: number;
+          totalRevenue: number;
+          totalExpenses: number;
+          netProfit: number;
+          profitMargin: number;
+          totalTransactions: number;
+          averageDailyRevenue: number;
+          averageDailyExpenses: number;
+          totalMealTickets: number;
+          averageMealTicketPrice: number;
+          currentCashBalance: number;
+          revenueChange: number;
+          expenseChange: number;
+          profitChange: number;
         };
       };
     };

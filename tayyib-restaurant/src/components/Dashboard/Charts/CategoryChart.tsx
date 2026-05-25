@@ -7,13 +7,26 @@ export default function CategoryChart({ data }: { data: CategoryBreakdown[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
-        <Pie data={data} dataKey="amount" nameKey="category" cx="50%" cy="50%" outerRadius={90} label>
+        <Pie
+          data={data}
+          dataKey="amount"
+          nameKey="category"
+          cx="50%"
+          cy="50%"
+          outerRadius={100}
+          innerRadius={50}
+          paddingAngle={3}
+          stroke="none"
+        >
           {data.map((_, index) => (
             <Cell key={index} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value: number) => `₦${value.toLocaleString()}`} />
-        <Legend />
+        <Tooltip
+          contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+          formatter={(value: number) => `₦${value.toLocaleString()}`}
+        />
+        <Legend iconType="circle" />
       </PieChart>
     </ResponsiveContainer>
   );

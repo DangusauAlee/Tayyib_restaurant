@@ -5,7 +5,7 @@ export interface User {
   email: string;
   full_name: string;
   role: UserRole;
-  restaurant_id: string;
+  restaurant_id: string | null;   // <-- was `string`, now nullable
   avatar_url?: string;
   phone?: string;
   is_active: boolean;

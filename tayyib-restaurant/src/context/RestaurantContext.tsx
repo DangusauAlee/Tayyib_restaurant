@@ -1,16 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
+import { createContext, useContext, ReactNode } from 'react';
+import { useAuthStore } from '../store/authStore';
 
 const RestaurantContext = createContext<{ restaurantId: string | null }>({ restaurantId: null });
 
 export function RestaurantProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (user) setRestaurantId(user.restaurant_id);
-    else setRestaurantId(null);
-  }, [user]);
+  const user = useAuthStore((s) => s.user);
+  const restaurantId = user?.restaurant_id ?? null;
 
   return (
     <RestaurantContext.Provider value={{ restaurantId }}>

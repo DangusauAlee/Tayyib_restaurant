@@ -24,13 +24,13 @@ export default function DashboardFilters({ filters, onFiltersChange }: Props) {
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow space-y-4">
+    <div className="bg-white p-5 rounded-2xl shadow-lg space-y-4">
       <div className="flex flex-wrap gap-2">
         {presets.map(p => (
           <button
             key={p.label}
             onClick={() => { setStartDate(p.start); setEndDate(p.end); }}
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+            className="px-4 py-1.5 text-sm bg-gray-100 rounded-full hover:bg-primary hover:text-white transition font-medium"
           >
             {p.label}
           </button>
@@ -38,19 +38,19 @@ export default function DashboardFilters({ filters, onFiltersChange }: Props) {
       </div>
       <div className="flex flex-wrap gap-4 items-end">
         <div>
-          <label className="block text-sm text-gray-600">Start Date</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="border rounded px-2 py-1" />
+          <label className="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
+          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition" />
         </div>
         <div>
-          <label className="block text-sm text-gray-600">End Date</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="border rounded px-2 py-1" />
+          <label className="block text-sm font-medium text-gray-600 mb-1">End Date</label>
+          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition" />
         </div>
         <div>
-          <label className="block text-sm text-gray-600">Group By</label>
+          <label className="block text-sm font-medium text-gray-600 mb-1">Group By</label>
           <select
             value={filters.groupBy}
             onChange={e => onFiltersChange({ ...filters, groupBy: e.target.value as GroupBy })}
-            className="border rounded px-2 py-1"
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
           >
             <option value="day">Day</option>
             <option value="month">Month</option>
@@ -59,17 +59,19 @@ export default function DashboardFilters({ filters, onFiltersChange }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-sm text-gray-600">Compare</label>
+          <label className="block text-sm font-medium text-gray-600 mb-1">Compare</label>
           <select
             value={filters.compareWith || ''}
             onChange={e => onFiltersChange({ ...filters, compareWith: e.target.value === 'previous' ? 'previous' : undefined })}
-            className="border rounded px-2 py-1"
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
           >
             <option value="">None</option>
             <option value="previous">Previous Period</option>
           </select>
         </div>
-        <Button onClick={apply} size="sm">Apply</Button>
+        <Button onClick={apply} size="sm" className="bg-primary text-white px-5 py-2 rounded-xl shadow-md hover:bg-primary-dark transition">
+          Apply
+        </Button>
       </div>
     </div>
   );

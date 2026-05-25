@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { useAuthStore } from './store/authStore';
 import { RestaurantProvider } from './context/RestaurantContext';
 import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout/Layout';
@@ -13,27 +14,52 @@ import UserForm from './components/Users/UserForm';
 import { ProtectedRoute } from './components/Common/ProtectedRoute';
 
 export default function App() {
+  const initialize = useAuthStore((s) => s.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <RestaurantProvider>
-          <Toaster position="top-right" />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedRoute allowedRoles={['MD', 'Manager', 'NMD']} />}>
-              <Route element={<Layout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="transactions" element={<TransactionList />} />
-                <Route path="transactions/new" element={<ProtectedRoute allowedRoles={['MD', 'Manager']}><TransactionForm /></ProtectedRoute>} />
-                <Route path="transactions/:id" element={<TransactionDetail />} />
-                <Route path="users" element={<ProtectedRoute allowedRoles={['MD']}><UserManagement /></ProtectedRoute>} />
-                <Route path="users/:id/edit" element={<ProtectedRoute allowedRoles={['MD']}><UserForm /></ProtectedRoute>} />
-              </Route>
+      <RestaurantProvider>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<ProtectedRoute allowedRoles={['MD', 'Manager', 'NMD']} />}>
+            <Route element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="transactions" element={<TransactionList />} />
+              <Route
+                path="transactions/new"
+                element={
+                  <ProtectedRoute allowedRoles={['MD', 'Manager']}>
+                    <TransactionForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="transactions/:id" element={<TransactionDetail />} />
+              <Route
+                path="users"
+                element={
+                  <ProtectedRoute allowedRoles={['MD']}>
+                    <UserManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="users/:id/edit"
+                element={
+                  <ProtectedRoute allowedRoles={['MD']}>
+                    <UserForm />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
-            <Route path="*" element={<div className="p-8">Page not found</div>} />
-          </Routes>
-        </RestaurantProvider>
-      </AuthProvider>
+          </Route>
+          <Route path="*" element={<div className="p-8">Page not found</div>} />
+        </Routes>
+      </RestaurantProvider>
     </BrowserRouter>
   );
 }
