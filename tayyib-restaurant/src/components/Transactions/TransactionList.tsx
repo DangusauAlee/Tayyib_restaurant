@@ -29,7 +29,7 @@ export default function TransactionList() {
   const [sortField, setSortField] = useState<keyof Transaction>('transaction_date');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  // Fetch transactions – NO view restriction
+  // ===== NO VIEW RESTRICTIONS – FETCH ALL TRANSACTIONS FOR THE RESTAURANT =====
   useEffect(() => {
     async function fetchData() {
       if (!restaurantId || !user) {
@@ -44,7 +44,7 @@ export default function TransactionList() {
         .select('*')
         .eq('restaurant_id', restaurantId);
 
-      // Only filter by a specific user if MD chooses a user from the dropdown
+      // Only filter by a specific user if the MD (or any role) deliberately picks a user from the dropdown
       if (filterUser) {
         query = query.eq('created_by', filterUser);
       }
@@ -71,7 +71,7 @@ export default function TransactionList() {
     fetchData();
   }, [restaurantId, user, startDate, endDate, searchTerm, filterUser, sortField, sortDir]);
 
-  // Load all users (with role) for filter dropdown and row display
+  // Load all users for the filter dropdown
   useEffect(() => {
     supabase
       .from('users')
@@ -81,7 +81,7 @@ export default function TransactionList() {
       });
   }, []);
 
-  // Delete handler
+  // Delete handler – MD can delete any, Manager can delete only their own
   const handleDelete = async (id: string) => {
     if (confirm('Permanently delete this transaction?')) {
       const { error } = await supabase.from('transactions').delete().eq('id', id);
@@ -116,7 +116,6 @@ export default function TransactionList() {
     );
   }
 
-  // Unified columns – visible to everyone
   const columns = [
     { key: 'transaction_date', label: 'Date' },
     { key: 'type', label: 'Type' },
@@ -129,7 +128,6 @@ export default function TransactionList() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-3">
         <h2 className="text-2xl font-bold text-gray-800">Transactions</h2>
         {(user?.role === 'MD' || user?.role === 'Manager') && (
@@ -139,7 +137,6 @@ export default function TransactionList() {
         )}
       </div>
 
-      {/* Filters */}
       <div className="bg-white p-4 rounded-2xl shadow space-y-3">
         <div className="flex flex-wrap gap-3 items-end">
           <div>
@@ -190,7 +187,6 @@ export default function TransactionList() {
 
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl">{error}</div>}
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 border-b">
@@ -256,38 +252,21 @@ export default function TransactionList() {
                           </td>
                         );
                       }
-
-                      if (col.key === 'transaction_date') {
-                        return (
-                          <td key={col.key} className="px-4 py-3">
-                            {formatDate(t.transaction_date)}
-                          </td>
-                        );
-                      }
-
-                      if (col.key === 'type') {
+                      if (col.key === 'transaction_date')
+                        return <td key={col.key} className="px-4 py-3">{formatDate(t.transaction_date)}</td>;
+                      if (col.key === 'type')
                         return (
                           <td key={col.key} className="px-4 py-3">
                             {isExpense ? (
-                              <span className="inline-block bg-primary/10 text-primary text-xs font-medium px-2 py-0.5 rounded-full">
-                                Expense
-                              </span>
+                              <span className="inline-block bg-primary/10 text-primary text-xs font-medium px-2 py-0.5 rounded-full">Expense</span>
                             ) : (
-                              <span className="inline-block bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
-                                Transaction
-                              </span>
+                              <span className="inline-block bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">Transaction</span>
                             )}
                           </td>
                         );
-                      }
-
                       if (col.key === 'description') {
                         if (isExpense) {
-                          return (
-                            <td key={col.key} className="px-4 py-3 max-w-[200px] truncate">
-                              {t.notes || '—'}
-                            </td>
-                          );
+                          return <td key={col.key} className="px-4 py-3 max-w-[200px] truncate">{t.notes || '—'}</td>;
                         } else {
                           return (
                             <td key={col.key} className="px-4 py-3">
@@ -299,31 +278,12 @@ export default function TransactionList() {
                           );
                         }
                       }
-
-                      if (col.key === 'total_spent') {
-                        return (
-                          <td key={col.key} className="px-4 py-3">
-                            {formatCurrency(t.total_spent)}
-                          </td>
-                        );
-                      }
-
-                      if (col.key === 'cash_balance') {
-                        return (
-                          <td key={col.key} className="px-4 py-3">
-                            {formatCurrency(t.cash_balance)}
-                          </td>
-                        );
-                      }
-
-                      if (col.key === 'created_by') {
-                        return (
-                          <td key={col.key} className="px-4 py-3 text-xs text-gray-500">
-                            {getUserName(t.created_by)}
-                          </td>
-                        );
-                      }
-
+                      if (col.key === 'total_spent')
+                        return <td key={col.key} className="px-4 py-3">{formatCurrency(t.total_spent)}</td>;
+                      if (col.key === 'cash_balance')
+                        return <td key={col.key} className="px-4 py-3">{formatCurrency(t.cash_balance)}</td>;
+                      if (col.key === 'created_by')
+                        return <td key={col.key} className="px-4 py-3 text-xs text-gray-500">{getUserName(t.created_by)}</td>;
                       return null;
                     })}
                   </tr>

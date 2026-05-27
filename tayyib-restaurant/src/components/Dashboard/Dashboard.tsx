@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRestaurant } from '../../context/RestaurantContext';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../store/authStore';
 import { useDashboardData } from '../../hooks/useDashboard';
 import DashboardFilters from './DashboardFilters';
 import MetricsCards from './MetricsCards';
@@ -9,9 +9,11 @@ import CategoryChart from './Charts/CategoryChart';
 import type { DashboardFilters as FilterType, GroupBy } from '../../types';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const user = useAuthStore((s) => s.user);
   const { restaurantId } = useRestaurant();
   const today = new Date().toISOString().slice(0, 10);
+
+  // NO createdBy filter – all roles see all data
   const [filters, setFilters] = useState<FilterType>({
     startDate: today,
     endDate: today,
@@ -20,7 +22,7 @@ export default function Dashboard() {
     compareWith: undefined,
     excludeWeekends: false,
     categoryFilter: [],
-    createdBy: user?.role === 'MD' ? undefined : user?.id,
+    createdBy: undefined,      // ← this was the culprit, now removed
   });
 
   const { metrics, prevMetrics, dailyData, categories, loading } = useDashboardData(filters);
@@ -35,7 +37,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Page title */}
       <div className="flex items-center gap-3">
         <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />

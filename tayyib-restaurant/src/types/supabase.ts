@@ -32,7 +32,13 @@ export interface Database {
           updated_at?: string;
           last_login?: string | null;
         };
-        Update: Partial<Database['public']['Tables']['users']['Insert']>;
+        Update: {
+          full_name?: string;
+          role?: 'MD' | 'Manager' | 'NMD';
+          is_active?: boolean;
+          phone?: string | null;
+          avatar_url?: string | null;
+        };
       };
       restaurants: {
         Row: {
@@ -115,9 +121,9 @@ export interface Database {
         Returns: Database['public']['Tables']['users']['Row'][];
       };
       get_daily_data: {
-  Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string; p_group_by?: string };
-  Returns: { period: string; revenue: number; expenses: number; profit: number; tickets: number }[];
-};
+        Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string; p_group_by?: string };
+        Returns: { period: string; revenue: number; expenses: number; profit: number; tickets: number }[];
+      };
       calculate_dashboard_metrics: {
         Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string };
         Returns: {
