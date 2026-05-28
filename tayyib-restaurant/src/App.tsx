@@ -38,9 +38,19 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="transactions/:id" element={<TransactionDetail />} />
-
-              {/* User Management routes */}
+              <Route
+                path="transactions/:id"
+                element={<TransactionDetail />}
+              />
+              {/* New: edit transaction */}
+              <Route
+                path="transactions/:id/edit"
+                element={
+                  <ProtectedRoute allowedRoles={['MD', 'Manager']}>
+                    <TransactionForm />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="users"
                 element={
@@ -49,7 +59,6 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* Create new user */}
               <Route
                 path="users/new"
                 element={
@@ -58,7 +67,6 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* Edit existing user */}
               <Route
                 path="users/:id/edit"
                 element={

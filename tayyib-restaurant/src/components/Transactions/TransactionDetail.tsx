@@ -5,30 +5,37 @@ import type { Transaction, PurchaseItem, Expense } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatting';
 import Button from '../Common/Button';
 
+type TransactionWithRelations = Transaction & {
+  purchase_items: PurchaseItem[];
+  expenses: Expense[];
+};
+
 export default function TransactionDetail() {
-  const { id } = useParams();
-  const [txn, setTxn] = useState<Transaction | null>(null);
-  const [items, setItems] = useState<PurchaseItem[]>([]);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const { id } = useParams<{ id: string }>();
+  const [txn, setTxn] = useState<TransactionWithRelations | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetch() {
-      const { data: t } = await supabase.from('transactions').select('*').eq('id', id).single();
-      if (t) {
-        setTxn(t);
-        const { data: it } = await supabase.from('purchase_items').select('*').eq('transaction_id', id);
-        const { data: ex } = await supabase.from('expenses').select('*').eq('transaction_id', id);
-        setItems(it || []);
-        setExpenses(ex || []);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*, purchase_items(*), expenses(*)')
+        .eq('id', id)
+        .single();
+
+      if (!error && data) {
+        setTxn(data as TransactionWithRelations);
       }
       setLoading(false);
     }
     fetch();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!txn) return <div>Transaction not found.</div>;
+  if (loading) return <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>;
+  if (!txn) return <div className="p-8 text-center">Transaction not found.</div>;
+
+  const items = txn.purchase_items || [];
+  const expenses = txn.expenses || [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
