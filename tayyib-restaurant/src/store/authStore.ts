@@ -23,6 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
       if (session?.user) {
         const { data: profile, error } = await supabase
           .from('users')
@@ -31,16 +32,23 @@ export const useAuthStore = create<AuthState>((set) => ({
           .single();
 
         if (!error && profile) {
-          set({ user: profile as User, isLoading: false });
+          const user = profile as User;
+          if (!user.is_active) {
+            // Inactive user – force sign out
+            await supabase.auth.signOut();
+            set({ user: null, isLoading: false, error: 'Account deactivated. Contact MD.' });
+            return;
+          }
+          set({ user, isLoading: false, error: null });
         } else {
           await supabase.auth.signOut();
-          set({ user: null, isLoading: false });
+          set({ user: null, isLoading: false, error: null });
         }
       } else {
-        set({ user: null, isLoading: false });
+        set({ user: null, isLoading: false, error: null });
       }
     } catch {
-      set({ user: null, isLoading: false });
+      set({ user: null, isLoading: false, error: null });
     }
   },
 
@@ -64,7 +72,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (profileError) throw profileError;
       if (!profile) throw new Error('User profile not found');
 
-      set({ user: profile as User, isAuthenticating: false });
+      const user = profile as User;
+      if (!user.is_active) {
+        // Immediately sign out the inactive user
+        await supabase.auth.signOut();
+        throw new Error('Your account has been deactivated. Contact the Managing Director.');
+      }
+
+      set({ user, isAuthenticating: false, error: null });
     } catch (err: any) {
       set({ error: err.message, isAuthenticating: false });
       throw err;
@@ -73,6 +88,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signOut: async () => {
     await supabase.auth.signOut();
-    set({ user: null });
+    set({ user: null, isLoading: false, error: null });
   },
 }));

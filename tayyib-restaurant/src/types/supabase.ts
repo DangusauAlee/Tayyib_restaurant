@@ -121,11 +121,41 @@ export interface Database {
         Returns: Database['public']['Tables']['users']['Row'][];
       };
       get_daily_data: {
-        Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string; p_group_by?: string };
-        Returns: { period: string; revenue: number; expenses: number; profit: number; tickets: number }[];
+        Args: {
+          p_restaurant_id: string;
+          p_start_date: string;
+          p_end_date: string;
+          p_group_by?: string;
+        };
+        Returns: {
+          period: string;
+          revenue: number;
+          expenses: number;
+          profit: number;
+          tickets: number;
+        }[];
       };
+
+      get_cumulative_data: {
+  Args: {
+    p_restaurant_id: string;
+    p_start_date: string;
+    p_end_date: string;
+    p_group_by?: string;
+  };
+  Returns: {
+    period: string;
+    cumulative_revenue: number;
+    cumulative_expenses: number;
+    cumulative_profit: number;
+  }[];
+};
       calculate_dashboard_metrics: {
-        Args: { p_restaurant_id: string; p_start_date: string; p_end_date: string };
+        Args: {
+          p_restaurant_id: string;
+          p_start_date: string;
+          p_end_date: string;
+        };
         Returns: {
           totalRevenue: number;
           totalExpenses: number;

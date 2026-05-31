@@ -21,7 +21,7 @@ export default function App() {
   }, [initialize]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <RestaurantProvider>
         <Toaster position="top-right" />
         <Routes>
@@ -38,11 +38,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="transactions/:id"
-                element={<TransactionDetail />}
-              />
-              {/* New: edit transaction */}
+              <Route path="transactions/:id" element={<TransactionDetail />} />
               <Route
                 path="transactions/:id/edit"
                 element={

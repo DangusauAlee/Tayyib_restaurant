@@ -21,16 +21,17 @@ export default function DashboardFilters({ filters, onFiltersChange }: Props) {
     { label: 'This Month', start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10), end: new Date().toISOString().slice(0,10) },
     { label: 'This Quarter', start: getQuarterStart(), end: new Date().toISOString().slice(0,10) },
     { label: 'This Year', start: `${new Date().getFullYear()}-01-01`, end: new Date().toISOString().slice(0,10) },
+    { label: 'All Time', start: '2000-01-01', end: new Date().toISOString().slice(0,10) },
   ];
 
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-lg space-y-4">
+    <div className="bg-white p-4 rounded-2xl shadow space-y-4">
       <div className="flex flex-wrap gap-2">
         {presets.map(p => (
           <button
             key={p.label}
             onClick={() => { setStartDate(p.start); setEndDate(p.end); }}
-            className="px-4 py-1.5 text-sm bg-gray-100 rounded-full hover:bg-primary hover:text-white transition font-medium"
+            className="px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-primary hover:text-white transition font-medium"
           >
             {p.label}
           </button>
@@ -69,9 +70,7 @@ export default function DashboardFilters({ filters, onFiltersChange }: Props) {
             <option value="previous">Previous Period</option>
           </select>
         </div>
-        <Button onClick={apply} size="sm" className="bg-primary text-white px-5 py-2 rounded-xl shadow-md hover:bg-primary-dark transition">
-          Apply
-        </Button>
+        <Button onClick={apply} size="sm">Apply</Button>
       </div>
     </div>
   );

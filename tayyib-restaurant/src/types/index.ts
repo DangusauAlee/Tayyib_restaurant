@@ -68,8 +68,10 @@ export interface DashboardMetrics {
   netProfit: number;
   profitMargin: number;
   totalTransactions: number;
+  daysCount: number;
   averageDailyRevenue: number;
   averageDailyExpenses: number;
+  averageDailyProfit: number;
   totalMealTickets: number;
   averageMealTicketPrice: number;
   currentCashBalance: number;
@@ -84,6 +86,7 @@ export interface DailyDataPoint {
   expenses: number;
   profit: number;
   tickets: number;
+  cashBalance: number;
 }
 
 export interface CategoryBreakdown {
@@ -104,4 +107,11 @@ export interface DashboardFilters {
   excludeWeekends?: boolean;
   categoryFilter?: string[];
   createdBy?: string;
+}
+
+export interface CumulativeDataPoint {
+  period: string;
+  cumulativeRevenue: number;
+  cumulativeExpenses: number;
+  cumulativeProfit: number;
 }

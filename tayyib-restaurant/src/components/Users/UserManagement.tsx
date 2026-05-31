@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import type { User } from '../../types';
 import Button from '../Common/Button';
+import toast from 'react-hot-toast';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -10,7 +11,7 @@ export default function UserManagement() {
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
-    const { data } = await supabase.from('users').select('*');
+    const { data } = await supabase.from('users').select('*').order('created_at', { ascending: true });
     setUsers((data as User[]) || []);
     setLoading(false);
   };
@@ -18,6 +19,23 @@ export default function UserManagement() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const toggleActive = async (user: User) => {
+    const newActive = !user.is_active;
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: newActive } as any)
+      .eq('id', user.id);
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(`${user.full_name} ${newActive ? 'activated' : 'deactivated'}`);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, is_active: newActive } : u))
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -51,10 +69,31 @@ export default function UserManagement() {
                 <td className="px-4 py-2">{u.full_name}</td>
                 <td className="px-4 py-2">{u.email}</td>
                 <td className="px-4 py-2">{u.role}</td>
-                <td className="px-4 py-2">{u.is_active ? 'Yes' : 'No'}</td>
                 <td className="px-4 py-2">
-                  <Button size="sm" variant="secondary" onClick={() => navigate(`/users/${u.id}/edit`)}>
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                      u.is_active
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {u.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td className="px-4 py-2 space-x-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate(`/users/${u.id}/edit`)}
+                  >
                     Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={u.is_active ? 'danger' : 'secondary'}
+                    onClick={() => toggleActive(u)}
+                  >
+                    {u.is_active ? 'Deactivate' : 'Activate'}
                   </Button>
                 </td>
               </tr>

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { DashboardMetrics, DailyDataPoint, CategoryBreakdown, DashboardFilters } from '../types';
+import type { DashboardMetrics, DailyDataPoint, CategoryBreakdown, CumulativeDataPoint, DashboardFilters } from '../types';
 import { subDays, format } from 'date-fns';
 
 export const dashboardService = {
@@ -10,22 +10,24 @@ export const dashboardService = {
       p_end_date: filters.endDate,
     });
     if (error) throw error;
-    // The function returns snake_case; map to camelCase
-    const d: any = data;
+
+    const d = data as any;
     return {
-      totalRevenue: Number(d.totalrevenue),
-      totalExpenses: Number(d.totalexpenses),
-      netProfit: Number(d.netprofit),
-      profitMargin: Number(d.profitmargin),
-      totalTransactions: Number(d.totaltransactions),
-      averageDailyRevenue: Number(d.averagedailyrevenue),
-      averageDailyExpenses: Number(d.averagedailyexpenses),
-      totalMealTickets: Number(d.totalmealtickets),
-      averageMealTicketPrice: Number(d.averagemealticketprice),
-      currentCashBalance: Number(d.currentcashbalance),
-      revenueChange: Number(d.revenuechange),
-      expenseChange: Number(d.expensechange),
-      profitChange: Number(d.profitchange),
+      totalRevenue: Number(d.totalrevenue ?? d.totalRevenue ?? 0),
+      totalExpenses: Number(d.totalexpenses ?? d.totalExpenses ?? 0),
+      netProfit: Number(d.netprofit ?? d.netProfit ?? 0),
+      profitMargin: Number(d.profitmargin ?? d.profitMargin ?? 0),
+      totalTransactions: Number(d.totaltransactions ?? d.totalTransactions ?? 0),
+      daysCount: Number(d.dayscount ?? d.daysCount ?? 0),
+      averageDailyRevenue: Number(d.averagedailyrevenue ?? d.averageDailyRevenue ?? 0),
+      averageDailyExpenses: Number(d.averagedailyexpenses ?? d.averageDailyExpenses ?? 0),
+      averageDailyProfit: Number(d.averagedailyprofit ?? d.averageDailyProfit ?? 0),
+      totalMealTickets: Number(d.totalmealtickets ?? d.totalMealTickets ?? 0),
+      averageMealTicketPrice: Number(d.averagemealticketprice ?? d.averageMealTicketPrice ?? 0),
+      currentCashBalance: Number(d.currentcashbalance ?? d.currentCashBalance ?? 0),
+      revenueChange: Number(d.revenuechange ?? d.revenueChange ?? 0),
+      expenseChange: Number(d.expensechange ?? d.expenseChange ?? 0),
+      profitChange: Number(d.profitchange ?? d.profitChange ?? 0),
     };
   },
 
@@ -37,12 +39,31 @@ export const dashboardService = {
       p_group_by: filters.groupBy,
     });
     if (error) throw error;
-    return (data || []).map(d => ({
+
+    return (data || []).map((d: any) => ({
       period: d.period,
       revenue: Number(d.revenue),
       expenses: Number(d.expenses),
       profit: Number(d.profit),
       tickets: Number(d.tickets),
+      cashBalance: Number(d.closing_balance ?? 0),   // note the column rename
+    }));
+  },
+
+  async getCumulativeData(filters: DashboardFilters): Promise<CumulativeDataPoint[]> {
+    const { data, error } = await supabase.rpc('get_cumulative_data', {
+      p_restaurant_id: filters.restaurantId,
+      p_start_date: filters.startDate,
+      p_end_date: filters.endDate,
+      p_group_by: filters.groupBy,
+    });
+    if (error) throw error;
+
+    return (data || []).map((d: any) => ({
+      period: d.period,
+      cumulativeRevenue: Number(d.cumulative_revenue),
+      cumulativeExpenses: Number(d.cumulative_expenses),
+      cumulativeProfit: Number(d.cumulative_profit),
     }));
   },
 
@@ -53,24 +74,28 @@ export const dashboardService = {
       .eq('restaurant_id', filters.restaurantId)
       .gte('transaction_date', filters.startDate)
       .lte('transaction_date', filters.endDate);
-    const txnIds = (txns || []).map(t => t.id);
+
+    const txnIds = (txns as any[] | null)?.map((t: any) => t.id) ?? [];
     if (txnIds.length === 0) return [];
+
     const { data: expenses } = await supabase
       .from('expenses')
       .select('category, amount')
       .in('transaction_id', txnIds);
+
     const totals: Record<string, number> = {};
     let grandTotal = 0;
-    expenses?.forEach(e => {
+    (expenses as any[] | null)?.forEach((e: any) => {
       const cat = e.category || 'other';
       totals[cat] = (totals[cat] || 0) + Number(e.amount);
       grandTotal += Number(e.amount);
     });
+
     return Object.entries(totals).map(([category, amount]) => ({
       category,
       amount,
       percentage: grandTotal ? (amount / grandTotal) * 100 : 0,
-      count: expenses?.filter(e => (e.category || 'other') === category).length || 0,
+      count: expenses?.filter((e: any) => (e.category || 'other') === category).length || 0,
     }));
   },
 
@@ -84,5 +109,5 @@ export const dashboardService = {
       start: format(prevStart, 'yyyy-MM-dd'),
       end: format(prevEnd, 'yyyy-MM-dd'),
     };
-  }
+  },
 };
