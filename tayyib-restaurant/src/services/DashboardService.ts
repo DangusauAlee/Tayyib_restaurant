@@ -13,21 +13,24 @@ export const dashboardService = {
 
     const d = data as any;
     return {
-      totalRevenue: Number(d.totalrevenue ?? d.totalRevenue ?? 0),
-      totalExpenses: Number(d.totalexpenses ?? d.totalExpenses ?? 0),
-      netProfit: Number(d.netprofit ?? d.netProfit ?? 0),
-      profitMargin: Number(d.profitmargin ?? d.profitMargin ?? 0),
-      totalTransactions: Number(d.totaltransactions ?? d.totalTransactions ?? 0),
-      daysCount: Number(d.dayscount ?? d.daysCount ?? 0),
-      averageDailyRevenue: Number(d.averagedailyrevenue ?? d.averageDailyRevenue ?? 0),
-      averageDailyExpenses: Number(d.averagedailyexpenses ?? d.averageDailyExpenses ?? 0),
-      averageDailyProfit: Number(d.averagedailyprofit ?? d.averageDailyProfit ?? 0),
-      totalMealTickets: Number(d.totalmealtickets ?? d.totalMealTickets ?? 0),
-      averageMealTicketPrice: Number(d.averagemealticketprice ?? d.averageMealTicketPrice ?? 0),
-      currentCashBalance: Number(d.currentcashbalance ?? d.currentCashBalance ?? 0),
-      revenueChange: Number(d.revenuechange ?? d.revenueChange ?? 0),
-      expenseChange: Number(d.expensechange ?? d.expenseChange ?? 0),
-      profitChange: Number(d.profitchange ?? d.profitChange ?? 0),
+      totalRevenue: Number(d.totalRevenue ?? 0),
+      totalExpenses: Number(d.totalExpenses ?? 0),
+      netProfit: Number(d.netProfit ?? 0),
+      profitMargin: Number(d.profitMargin ?? 0),
+      totalTransactions: Number(d.totalTransactions ?? 0),
+      daysCount: Number(d.daysCount ?? 0),
+      averageDailyRevenue: Number(d.averageDailyRevenue ?? 0),
+      averageDailyExpenses: Number(d.averageDailyExpenses ?? 0),
+      averageDailyProfit: Number(d.averageDailyProfit ?? 0),
+      totalMealTickets: Number(d.totalMealTickets ?? 0),
+      averageDailyTickets: Number(d.averageDailyTickets ?? 0),
+      totalCashReceived: Number(d.totalCashReceived ?? 0),
+      currentCashBalance: Number(d.currentCashBalance ?? 0),
+      revenueChange: Number(d.revenueChange ?? 0),
+      expenseChange: Number(d.expenseChange ?? 0),
+      profitChange: Number(d.profitChange ?? 0),
+      averageMealTicketPrice: 1200, // constant, kept for backward compatibility
+      totalPOS: Number(d.totalpos ?? d.totalPOS ?? 0),
     };
   },
 
@@ -46,7 +49,7 @@ export const dashboardService = {
       expenses: Number(d.expenses),
       profit: Number(d.profit),
       tickets: Number(d.tickets),
-      cashBalance: Number(d.closing_balance ?? 0),   // note the column rename
+      cashBalance: Number(d.closing_balance ?? 0),
     }));
   },
 

@@ -78,6 +78,9 @@ export interface DashboardMetrics {
   revenueChange: number;
   expenseChange: number;
   profitChange: number;
+  averageDailyTickets: number;        // new
+  totalCashReceived: number;          // new
+  totalPOS: number;  
 }
 
 export interface DailyDataPoint {

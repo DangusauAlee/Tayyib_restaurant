@@ -19,56 +19,64 @@ export default function MetricsCards({
       total: metrics.totalRevenue,
       dailyAvg: metrics.averageDailyRevenue,
       prevTotal: previousMetrics?.totalRevenue,
+      format: formatCurrency,
     },
     {
       label: 'Total Expenses',
       total: metrics.totalExpenses,
       dailyAvg: metrics.averageDailyExpenses,
       prevTotal: previousMetrics?.totalExpenses,
+      format: formatCurrency,
     },
     {
       label: 'Net Profit',
       total: metrics.netProfit,
       dailyAvg: metrics.averageDailyProfit,
       prevTotal: previousMetrics?.netProfit,
+      format: formatCurrency,
     },
     {
-      label: 'Cash Balance',
-      total: metrics.currentCashBalance,
-      dailyAvg: metrics.averageDailyProfit, // no separate daily cash avg, use profit? We'll just show total
-      prevTotal: previousMetrics?.currentCashBalance,
+      label: 'Cash Received',
+      total: metrics.totalCashReceived,
+      dailyAvg: metrics.daysCount > 0 ? metrics.totalCashReceived / metrics.daysCount : 0,
+      prevTotal: previousMetrics?.totalCashReceived,
+      format: formatCurrency,
     },
     {
-      label: 'Meal Tickets',
+      label: 'Total Meal Tickets',
       total: metrics.totalMealTickets,
-      dailyAvg: metrics.daysCount > 0 ? Math.round(metrics.totalMealTickets / metrics.daysCount) : 0,
+      dailyAvg: metrics.averageDailyTickets,
       prevTotal: previousMetrics?.totalMealTickets,
+      format: (val: number) => val.toLocaleString(),
     },
     {
-      label: 'Avg Ticket Price',
-      total: metrics.averageMealTicketPrice,
-      dailyAvg: metrics.averageMealTicketPrice, // ticket price is already average
-      prevTotal: previousMetrics?.averageMealTicketPrice,
+      label: 'Card/Transfer Rev',
+      total: metrics.totalPOS,
+      dailyAvg: metrics.daysCount > 0 ? metrics.totalPOS / metrics.daysCount : 0,
+      prevTotal: previousMetrics?.totalPOS,
+      format: formatCurrency,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
       {items.map((item) => {
-        const change = previousMetrics ? pctChange(item.total, item.prevTotal ?? 0) : 0;
+        const change = item.prevTotal != null ? pctChange(item.total, item.prevTotal) : 0;
         return (
-          <div key={item.label} className="bg-white p-2 md:p-4 rounded-xl shadow-sm">
+          <div key={item.label} className="bg-white p-2 md:p-3 rounded-xl shadow-sm">
             <div className="text-xs text-gray-500 truncate">{item.label}</div>
-            <div className="text-base md:text-lg font-bold text-gray-800">
-              {typeof item.total === 'number' && item.label.includes('Price')
-                ? formatCurrency(item.total)
-                : item.total.toLocaleString()}
+            <div className="text-base md:text-lg font-bold text-gray-800 mt-1">
+              {item.format(item.total)}
             </div>
-            <div className="text-xs text-gray-500 mt-0.5">
-              Avg/day: {typeof item.dailyAvg === 'number' ? item.dailyAvg.toLocaleString() : '—'}
+            <div className="text-xs text-gray-400 mt-1">
+              Avg/day: {item.format(item.dailyAvg)}
             </div>
             {previousMetrics && (
-              <div className={`text-xs mt-0.5 flex items-center gap-1 ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div
+                className={`text-xs mt-1 flex items-center gap-1 ${
+                  change >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
                 {change > 0 ? '▲' : change < 0 ? '▼' : '•'} {Math.abs(change).toFixed(1)}%
               </div>
             )}
