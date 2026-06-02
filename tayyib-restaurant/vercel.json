@@ -1,4 +1,10 @@
 {
+  "build": {
+    "framework": "vite",
+    "command": "npm run build",
+    "output": "dist",
+    "rootDirectory": "tayyib-restaurant"
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
