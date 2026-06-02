@@ -1,10 +1,7 @@
 {
-  "build": {
-    "framework": "vite",
-    "command": "npm run build",
-    "output": "dist",
-    "rootDirectory": "tayyib-restaurant"
-  },
+  "installCommand": "cd tayyib-restaurant && npm install",
+  "buildCommand": "cd tayyib-restaurant && npm run build",
+  "outputDirectory": "tayyib-restaurant/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
